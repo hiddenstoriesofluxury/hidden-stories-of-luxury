@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hidden Stories of Luxury</title>
+<meta name="description" content="The stories the great luxury houses never put in the window. Tap the book to open one.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one screen, one object. An old cloth-bound book turns in the dark over a dusk
+   horizon; each story has its own binding. A few taps force it open, and the story is on its pages. */
+@property --c0 { syntax: "<color>"; inherits: true; initial-value: #16040a; }
+@property --c1 { syntax: "<color>"; inherits: true; initial-value: #6a1226; }
+:root {
+  color-scheme: dark;
+  --ink: #050506;        /* page black */
+  --milk: #f4f2ec;       /* milky-white text */
+  --dim: #a09a8f;        /* secondary text */
+  --deep-red: #8c0c0a;   /* the red of the logo; key facts on paper */
+  --gold: #e6b84a;       /* gilding */
+  --paper: #efe5cf;      /* the book's pages */
+  --print: #1d1712;      /* text printed on the pages */
+  --c0: #16040a; --c1: #6a1226; --cover: #7d0f1a;   /* scene and binding colours, set per story */
+  --display: "Italiana", "Didot", "Bodoni MT", Georgia, serif;   /* stand-in until the Alta font file is added */
+  --body: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --serif: "Instrument Serif", "Didot", Georgia, serif;   /* book text and italic accents */
+  transition: --c0 1.2s ease, --c1 1.2s ease;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; overflow: hidden; background: var(--ink); color: var(--milk);
+  font-family: var(--body); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+[hidden] { display: none !important; }
+.caps { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: .01em; }
+.eyebrow { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+
+/* the scene */
+#stage { position: fixed; inset: 0; overflow: hidden; }
+.sky {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 55% at 16% 124%, #040405 60%, transparent 60.4%),
+    radial-gradient(130% 48% at 90% 128%, rgba(0, 0, 0, .78) 60%, transparent 60.4%),
+    radial-gradient(60vmin 46vmin at 50% 40%, rgba(230, 184, 74, .15), transparent 70%),
+    linear-gradient(180deg, #040405 0%, var(--c0) 46%, var(--c1) 100%);
+}
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.flat-book { position: absolute; left: 50%; top: 40%; height: 46%; transform: translate(-50%, -50%) rotate(-5deg); filter: drop-shadow(0 20px 50px rgba(0, 0, 0, .7)); }
+
+/* top bar */
+header { position: fixed; top: 0; left: 0; right: 0; z-index: 6; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 24px; }
+.brand { font-weight: 600; font-size: 14px; text-decoration: none; }
+.toplink { font-size: 14px; color: rgba(244, 242, 236, .7); text-decoration: none; padding: 6px 2px; }
+.toplink:hover { color: var(--milk); }
+
+/* story index */
+.index { position: fixed; z-index: 3; left: 24px; top: 50%; transform: translateY(-50%); list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; transition: opacity .4s; }
+.index button { font-size: 12px; letter-spacing: .02em; color: rgba(244, 242, 236, .5); display: flex; gap: 12px; padding: 4px 0; font-variant-numeric: tabular-nums; }
+.index button:hover, .index button[aria-current="true"] { color: var(--milk); }
+.index button[aria-current="true"]::after { content: ""; width: 22px; height: 1px; background: var(--gold); align-self: center; }
+
+/* the book's tap area */
+#open { position: fixed; z-index: 2; left: 50%; top: 10%; width: min(60vw, 440px); height: 56%; transform: translateX(-50%); border-radius: 12px; -webkit-tap-highlight-color: transparent; }
+
+/* title carousel */
+.carousel { position: fixed; z-index: 3; left: 0; right: 0; bottom: 0; padding: 0 24px 24px; text-align: center; pointer-events: none; transition: opacity .4s, transform .5s; }
+.carousel > * { pointer-events: auto; }
+.cur { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; }
+.count { font-size: 12px; letter-spacing: .24em; color: var(--gold); font-variant-numeric: tabular-nums; }
+.cur h1 { margin: 0; font-size: clamp(42px, 10vw, 136px); line-height: .9; max-width: 11ch; text-wrap: balance; cursor: pointer; text-shadow: 0 6px 40px rgba(0, 0, 0, .6); }
+.hook { margin: 2px 0 0; font-family: var(--serif); font-style: italic; font-size: clamp(18px, 2vw, 24px); line-height: 1.2; color: rgba(244, 242, 236, .85); }
+.hint { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); display: inline-flex; gap: 12px; align-items: center; }
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--gold); transition: background .3s, box-shadow .3s; }
+.dots i.on { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+.side { position: absolute; bottom: 76px; font-size: clamp(22px, 5vw, 70px); line-height: .92; max-width: 9ch; color: rgba(244, 242, 236, .32); transition: color .25s; }
+.side:hover { color: var(--milk); }
+.side.prev { left: 3vw; text-align: left; transform: perspective(600px) rotateY(24deg); transform-origin: left center; }
+.side.next { right: 3vw; text-align: right; transform: perspective(600px) rotateY(-24deg); transform-origin: right center; }
+.swap .cur { animation: rise .7s cubic-bezier(.2, .8, .2, 1); }
+.swap .side { animation: fade .7s ease; }
+@keyframes rise { from { opacity: 0; transform: translateY(26px) scale(.96); } }
+@keyframes fade { from { opacity: 0; } }
+body.open .carousel { opacity: 0; transform: translateY(30px); }
+body.open .carousel > *, body.open .index { pointer-events: none; }
+body.open .index { opacity: 0; }
+body.open #open { display: none; }
+
+/* the open book */
+.panel { position: fixed; z-index: 5; inset: 72px 36px 36px; display: grid; place-items: center; pointer-events: none; }
+.spread {
+  pointer-events: auto; position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  width: min(1020px, 100%); height: min(660px, 100%); color: var(--print); border-radius: 5px;
+  background: radial-gradient(120% 80% at 50% 0%, #f8f1df, var(--paper) 70%);
+  box-shadow: inset 0 0 70px rgba(120, 86, 36, .28), 0 0 0 10px var(--cover), 0 0 0 12px rgba(0, 0, 0, .55), 0 40px 120px rgba(0, 0, 0, .8);
+  animation: reveal .7s .8s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+.spread:focus { outline: none; }
+.spread::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 70px; transform: translateX(-50%); pointer-events: none; background: linear-gradient(90deg, transparent, rgba(70, 46, 18, .3) 47%, rgba(30, 18, 6, .42) 50%, rgba(70, 46, 18, .3) 53%, transparent); }
+@keyframes reveal { from { opacity: 0; transform: scale(.9); } }
+.page { overflow: auto; padding: clamp(22px, 3.6vw, 46px); min-height: 0; }
+.plate { position: relative; height: clamp(130px, 24vh, 210px); overflow: hidden; border-radius: 4px; border: 1px solid rgba(29, 23, 18, .35); box-shadow: 0 0 0 5px var(--paper), 0 0 0 6px rgba(29, 23, 18, .25); margin: 6px 6px 24px; background: #000; }
+.plate .art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.plate .logo { display: block; width: 100%; height: 100%; object-fit: contain; }
+.spread .eyebrow { color: rgba(29, 23, 18, .6); }
+.spread h2 { margin: 12px 0 12px; font-size: clamp(26px, 3.4vw, 42px); line-height: 1.02; text-wrap: balance; }
+.dek { font-family: var(--serif); font-style: italic; font-size: 23px; line-height: 1.28; color: rgba(29, 23, 18, .72); margin: 0; }
+.story p { margin: 0 0 16px; font-family: var(--serif); font-size: 21px; line-height: 1.45; }
+.story p:first-child::first-letter { font-family: var(--display); font-size: 3.5em; float: left; line-height: .8; padding: 6px 8px 0 0; color: var(--deep-red); }
+.story mark { background: none; color: var(--deep-red); font-style: italic; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.tag { display: inline-block; font: 700 10px var(--body); letter-spacing: .2em; text-transform: uppercase; padding: 4px 9px; border: 1px solid var(--deep-red); border-radius: 999px; color: var(--deep-red); }
+.nextrow { margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(29, 23, 18, .25); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.textbtn { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: rgba(29, 23, 18, .62); }
+.textbtn:hover { color: var(--print); }
+
+/* brand pages */
+.steps { list-style: none; margin: 20px 0 0; padding: 0; counter-reset: s; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.steps li { counter-increment: s; padding: 11px 13px; border: 1px solid rgba(29, 23, 18, .22); border-radius: 8px; font-size: 13.5px; line-height: 1.35; color: rgba(29, 23, 18, .7); }
+.steps li::before { content: counter(s, decimal-leading-zero); display: block; font-size: 11px; letter-spacing: .2em; color: var(--deep-red); margin-bottom: 4px; }
+.steps b { display: block; color: var(--print); font-weight: 600; }
+form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.f { display: flex; flex-direction: column; gap: 6px; }
+.f.full { grid-column: 1 / -1; }
+label { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: rgba(29, 23, 18, .65); font-weight: 600; }
+input, textarea, select { font: 400 16px var(--body); color: var(--print); background: rgba(255, 255, 255, .55); border: 1px solid rgba(29, 23, 18, .28); border-radius: 8px; padding: 11px 13px; width: 100%; color-scheme: light; }
+textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--deep-red); box-shadow: 0 0 0 4px rgba(140, 12, 10, .14); }
+.check { flex-direction: row; align-items: flex-start; gap: 10px; }
+.check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--deep-red); flex: none; }
+.check label { letter-spacing: 0; text-transform: none; font-size: 14.5px; font-weight: 400; }
+.notice { grid-column: 1 / -1; border: 1px solid rgba(29, 23, 18, .22); border-left: 3px solid var(--deep-red); border-radius: 8px; background: rgba(255, 255, 255, .5); padding: 11px 14px; font-size: 13.5px; line-height: 1.4; }
+.send { justify-self: start; font: 700 12px/1 var(--body); letter-spacing: .22em; text-transform: uppercase; padding: 16px 24px; border-radius: 999px; background: var(--print); color: var(--paper); transition: transform .2s, box-shadow .2s; }
+.send:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(29, 23, 18, .35); }
+.small { font-size: 12.5px; line-height: 1.4; color: rgba(29, 23, 18, .6); margin: 18px 0 0; }
+
+@media (max-width: 900px) { .index { display: none; } }
+@media (max-width: 760px) {
+  .panel { inset: 62px 18px 18px; }
+  .spread { grid-template-columns: 1fr; height: auto; max-height: 100%; overflow: auto; }
+  .spread::after { display: none; }
+  .page { overflow: visible; }
+  .page.right { padding-top: 0; }
+  form, .steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .side { bottom: auto; top: -30px; font-size: 20px; max-width: none; white-space: nowrap; }
+  .side.prev { left: -6vw; } .side.next { right: -6vw; }
+  .carousel { padding-bottom: 16px; }
+  #open { top: 11%; height: 46%; width: 74vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root, .carousel, .side { transition: none; }
+  .swap .cur, .swap .side, .spread { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="stage" aria-hidden="true">
+  <div class="sky"></div>
+  <canvas id="gl"></canvas>
+  <svg class="flat-book" id="flat-book" viewBox="0 0 230 320" hidden>
+    <rect width="230" height="320" rx="5" fill="var(--cover)"/><rect x="14" y="14" width="202" height="292" fill="none" stroke="#e6b84a" stroke-width="3"/><rect x="26" y="26" width="178" height="268" fill="none" stroke="#e6b84a"/><ellipse cx="115" cy="160" rx="62" ry="86" fill="none" stroke="#e6b84a" stroke-width="2.5"/>
+  </svg>
+</div>
+
+<header>
+  <a class="brand" href="#gallery">Hidden Stories of Luxury</a>
+  <a class="toplink" id="toplink" href="#tell-your-story">For brands</a>
+</header>
+
+<ol class="index" id="index" aria-label="All stories"></ol>
+
+<button id="open" aria-label="Tap the book to open it"></button>
+
+<div class="carousel" id="carousel">
+  <button class="side prev caps" id="prev" aria-label="Previous story"></button>
+  <div class="cur">
+    <span class="count" id="count"></span>
+    <h1 class="caps" id="cur-title"></h1>
+    <p class="hook" id="cur-hook"></p>
+    <span class="hint"><span class="dots" id="dots"></span><span id="cur-hint" aria-live="polite"></span></span>
+  </div>
+  <button class="side next caps" id="next" aria-label="Next story"></button>
+</div>
+
+<div class="panel" id="story-panel" hidden>
+  <article class="spread" id="story-sheet" tabindex="-1">
+    <section class="page left">
+      <div class="plate" id="s-cover"></div>
+      <div class="eyebrow" id="s-no"></div>
+      <h2 class="caps" id="s-title"></h2>
+      <p class="dek" id="s-dek"></p>
+    </section>
+    <section class="page right">
+      <div class="story" id="s-body"></div>
+      <div class="nextrow">
+        <button class="textbtn" data-close>&larr; Close the book</button>
+        <button class="textbtn" id="s-next"></button>
+      </div>
+    </section>
+  </article>
+</div>
+
+<div class="panel" id="brand-panel" hidden>
+  <div class="spread" id="brand-sheet" tabindex="-1">
+    <section class="page left">
+      <div class="plate"><img class="logo" src="logo.png" width="1400" height="818" alt="Hidden Stories of Luxury logo: one hand passing a key to another"></div>
+      <div class="eyebrow">For brands</div>
+      <h2 class="caps">Your house has a story nobody has heard yet.</h2>
+      <p class="dek">Tell us, and we write it into this library and film it as a reel for our audience.</p>
+      <ol class="steps">
+        <li><b>You fill in the form</b>A few lines about the brand and the story.</li>
+        <li><b>We get in touch</b>We reply personally about angle, format and price.</li>
+        <li><b>You approve it</b>Nothing is published without your yes.</li>
+        <li><b>It goes live</b>Here and on Instagram, marked <span class="tag">Told by the brand</span></li>
+      </ol>
+    </section>
+    <section class="page right">
+      <div class="notice" id="soon-note" hidden><b>Brand enquiries open here soon.</b> Until then, message Hidden Stories of Luxury on Instagram.</div>
+      <form id="brand-form" novalidate>
+        
+        <div class="f"><label for="f-brand">Brand</label><input id="f-brand" name="brand" required autocomplete="organization"></div>
+        <div class="f"><label for="f-name">Your name and role</label><input id="f-name" name="name" required autocomplete="name"></div>
+        <div class="f"><label for="f-email">Email</label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
+        <div class="f"><label for="f-link">Website or Instagram</label><input id="f-link" name="link" placeholder="@yourbrand"></div>
+        <div class="f full"><label for="f-story">The hidden story</label><textarea id="f-story" name="story" required placeholder="What happened, when, and why has it never been told?"></textarea></div>
+        <div class="f"><label for="f-format">What you want</label>
+          <select id="f-format" name="format"><option>Written story and reel</option><option>Reel only</option><option>Written story only</option><option>Not sure yet</option></select>
+        </div>
+        <div class="f"><label for="f-when">When</label>
+          <select id="f-when" name="timing"><option>As soon as possible</option><option>Within 1 to 3 months</option><option>Just exploring</option></select>
+        </div>
+        <div class="f full check"><input type="checkbox" id="f-ok" name="consent" required><label for="f-ok">I agree to be contacted about this request.</label></div>
+        <div class="notice" id="form-msg" role="status" hidden></div>
+        <div class="f full"><button class="send" type="submit" id="f-send">Send your story</button></div>
+      </form>
+      <p class="small">Independent; not affiliated with the brands featured. Brand stories are paid partnerships and are marked as such.</p>
+      <div class="nextrow"><button class="textbtn" data-close>&larr; Close the book</button></div>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="stories.js"></script>
+<script>
+/* The last stop on the carousel: the door for brands. */
+const BRAND_ITEM = { id: "tell-your-story", brand: "Your brand?", isBrand: true, colors: ["#0b0906", "#4a370c", "#e6b84a"], cover: "#17171c", hook: "The next hidden story could be yours" };
+const ITEMS = [...STORIES, BRAND_ITEM];
+
+/* ============ COVER ART (drawn in code, 300 × 430) ============ */
+let artSeq = 0;
+function stars(n, maxY, seed) {
+  let s = seed, out = "";
+  const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < n; i++) out += `<circle cx="${(r() * 300).toFixed(1)}" cy="${(r() * maxY).toFixed(1)}" r="${(r() * 1.1 + .3).toFixed(2)}" fill="#fff" opacity="${(r() * .6 + .2).toFixed(2)}"/>`;
+  return out;
+}
+const ART = {
+  pearls(c, u) {
+    const strand = (rx, ry, n, r) => { let o = ""; for (let i = 0; i < n; i++) { const t = Math.PI * (0.06 + 0.88 * i / (n - 1)); o += `<circle cx="${(150 - rx * Math.cos(t)).toFixed(1)}" cy="${(70 + ry * Math.sin(t)).toFixed(1)}" r="${r}" fill="url(#p${u})"/>`; } return o; };
+    return `<defs><radialGradient id="p${u}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#e9dccb"/><stop offset="1" stop-color="#6d5a55"/></radialGradient></defs>
+      <circle cx="150" cy="150" r="170" fill="${c[1]}" opacity=".55"/>${strand(118, 190, 27, 8.2)}${strand(88, 138, 21, 7.2)}<circle cx="150" cy="286" r="13" fill="url(#p${u})"/>`;
+  },
+  window(c, u) {
+    return `<defs><linearGradient id="s${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c1430"/><stop offset=".6" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient><clipPath id="w${u}"><rect x="78" y="56" width="144" height="212" rx="72"/></clipPath></defs>
+      <rect x="62" y="40" width="176" height="244" rx="88" fill="#1c120c" stroke="${c[2]}" stroke-opacity=".35"/>
+      <g clip-path="url(#w${u})"><rect x="78" y="56" width="144" height="212" fill="url(#s${u})"/>${stars(26, 150, 7)}
+        <circle cx="178" cy="104" r="17" fill="#fff3df"/><circle cx="186" cy="99" r="16" fill="#101632"/>
+        <ellipse cx="120" cy="238" rx="70" ry="16" fill="#fff" opacity=".35"/><ellipse cx="200" cy="252" rx="60" ry="14" fill="#fff" opacity=".5"/><ellipse cx="110" cy="266" rx="80" ry="14" fill="#fff" opacity=".7"/></g>
+      <rect x="78" y="56" width="144" height="212" rx="72" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="5"/>`;
+  },
+  road(c) {
+    let sky = ""; [[92, 20], [104, 30], [118, 16], [128, 38], [142, 24], [154, 46], [168, 28], [180, 18], [192, 32], [204, 22]].forEach(([x, h]) => sky += `<rect x="${x}" y="${190 - h}" width="9" height="${h}" fill="#050403"/>`);
+    return `${stars(40, 170, 3)}<circle cx="150" cy="186" r="72" fill="${c[2]}" opacity=".22"/><circle cx="150" cy="186" r="40" fill="${c[2]}" opacity=".35"/>
+      ${sky}<rect x="0" y="190" width="300" height="240" fill="#090604"/>
+      <path d="M150 190 C120 250 210 290 150 340 C110 372 60 400 20 430 H280 C240 400 190 372 210 340 C250 290 160 250 150 190Z" fill="${c[1]}"/>
+      <path d="M150 196 C128 250 204 292 164 340 C140 372 150 400 150 430" fill="none" stroke="${c[2]}" stroke-width="2.5" stroke-dasharray="3 13" opacity=".8"/>`;
+  },
+  sea(c) {
+    let ticks = "", waves = "";
+    for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; ticks += `<line x1="${(150 + 52 * Math.sin(a)).toFixed(1)}" y1="${(128 - 52 * Math.cos(a)).toFixed(1)}" x2="${(150 + 62 * Math.sin(a)).toFixed(1)}" y2="${(128 - 62 * Math.cos(a)).toFixed(1)}" stroke="${c[2]}" stroke-width="${i % 3 ? 1.5 : 3.5}"/>`; }
+    for (let i = 0; i < 6; i++) { const y = 216 + i * 36, d = i % 2 ? 16 : -16; waves += `<path d="M-40 ${y} q40 ${d} 80 0 t80 0 t80 0 t80 0 t80 0 V430 H-40Z" fill="${c[1]}" opacity="${(.3 + i * .12).toFixed(2)}"/>`; }
+    return `${stars(24, 200, 11)}<circle cx="150" cy="128" r="96" fill="${c[1]}" opacity=".4"/>
+      <circle cx="150" cy="128" r="70" fill="#04140d" stroke="${c[2]}" stroke-width="3"/>${ticks}
+      <line x1="150" y1="128" x2="150" y2="86" stroke="${c[2]}" stroke-width="4" stroke-linecap="round"/><line x1="150" y1="128" x2="180" y2="146" stroke="${c[2]}" stroke-width="3" stroke-linecap="round"/><circle cx="150" cy="128" r="5" fill="${c[2]}"/>${waves}`;
+  }
+};
+function art(s) {
+  const u = ++artSeq, c = s.colors;
+  return `<svg class="art" viewBox="0 0 300 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="b${u}" x1="0" y1="0" x2=".4" y2="1"><stop offset="0" stop-color="${c[1]}"/><stop offset=".55" stop-color="${c[0]}"/><stop offset="1" stop-color="#020202"/></linearGradient></defs>
+    <rect width="300" height="430" fill="url(#b${u})"/>${(ART[s.art] || ART.pearls)(c, u)}</svg>`;
+}
+
+/* ============ THE BOOK (3D) ============ */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TAPS = 3;   // how many taps it takes to force the book open
+const book3d = { stage: 0, hoverTarget: 0, boost: 0, jolt: 0, setItem() {} };
+
+/* Paints one cover. mode "color" is what you see; "orm" tells the light which parts are gilded;
+   "bump" raises the tooling. label is stamped in the oval. */
+function paintCover(cv, mode, color, label, gilt) {
+  const w = cv.width, h = cv.height, x = cv.getContext("2d"), u = w / 512;
+  let seed = 3; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  if (mode === "color") {
+    x.fillStyle = color; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) { x.fillStyle = rnd() > .5 ? "rgba(0,0,0,.07)" : "rgba(255,255,255,.05)"; x.fillRect(rnd() * w, rnd() * h, 1.6 * u, 1.6 * u); }
+    const v = x.createRadialGradient(w / 2, h / 2, h * .25, w / 2, h / 2, h * .72); v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,.42)");
+    x.fillStyle = v; x.fillRect(0, 0, w, h);
+  } else { x.fillStyle = mode === "orm" ? "rgb(0,175,0)" : "#808080"; x.fillRect(0, 0, w, h); }
+  // blind tooling: pressed lines with a lit edge
+  const pressed = (draw) => {
+    if (mode === "orm") return;
+    x.save(); x.strokeStyle = mode === "bump" ? "#3c3c3c" : "rgba(0,0,0,.4)"; draw(); x.restore();
+    if (mode === "color") { x.save(); x.translate(1.4 * u, 1.4 * u); x.strokeStyle = "rgba(255,255,255,.13)"; draw(); x.restore(); }
+  };
+  x.lineWidth = 2.2 * u;
+  [12, 20, 58, 100].forEach((m) => pressed(() => x.strokeRect(m * u, m * u, w - 2 * m * u, h - 2 * m * u)));
+  pressed(() => { x.beginPath(); x.ellipse(w / 2, h / 2, w * .3, h * .3, 0, 0, 7); x.stroke(); });
+  if (!gilt) return;
+  // gilding
+  let paint = "#fff";
+  if (mode === "color") { paint = x.createLinearGradient(0, 0, w, h); [[0, "#fbe7a1"], [.3, "#d9a93f"], [.55, "#f6dc8c"], [.8, "#b8862b"], [1, "#f3d57c"]].forEach(([o, c]) => paint.addColorStop(o, c)); }
+  if (mode === "orm") paint = "rgb(0,60,255)";
+  x.strokeStyle = paint; x.fillStyle = paint;
+  const rect = (m, lw) => { x.lineWidth = lw * u; x.strokeRect(m * u, m * u, w - 2 * m * u, h - 2 * m * u); };
+  rect(30, 4.5); rect(38, 1.5); rect(84, 3.5); rect(92, 1.3);
+  const diamond = (cx, cy, r) => { x.beginPath(); x.moveTo(cx, cy - r); x.lineTo(cx + r * .7, cy); x.lineTo(cx, cy + r); x.lineTo(cx - r * .7, cy); x.closePath(); x.fill(); };
+  const dot = (cx, cy, r) => { x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); };
+  const band = 61 * u, nx = 15, ny = 22;
+  for (let i = 0; i <= nx; i++) { const px = 110 * u + (w - 220 * u) * i / nx; [band, h - band].forEach((py) => { diamond(px, py, 7 * u); if (i < nx) dot(px + (w - 220 * u) / nx / 2, py, 2.2 * u); }); }
+  for (let i = 0; i <= ny; i++) { const py = 110 * u + (h - 220 * u) * i / ny; [band, w - band].forEach((px) => { diamond(px, py, 7 * u); if (i < ny) dot(px, py + (h - 220 * u) / ny / 2, 2.2 * u); }); }
+  [[band, band], [w - band, band], [band, h - band], [w - band, h - band]].forEach(([cx, cy]) => {
+    x.save(); x.globalCompositeOperation = mode === "color" ? "source-over" : "source-over";
+    x.fillStyle = mode === "color" ? color : (mode === "orm" ? "rgb(0,175,0)" : "#808080"); dot(cx, cy, 27 * u); x.restore();
+    x.lineWidth = 3 * u; x.beginPath(); x.arc(cx, cy, 25 * u, 0, 7); x.stroke();
+    x.lineWidth = 1.2 * u; x.beginPath(); x.arc(cx, cy, 18 * u, 0, 7); x.stroke();
+    for (let k = 0; k < 8; k++) dot(cx + Math.cos(k * Math.PI / 4) * 10 * u, cy + Math.sin(k * Math.PI / 4) * 10 * u, 3.2 * u);
+    dot(cx, cy, 3.6 * u);
+  });
+  const rx = w * .285, ry = h * .285;
+  x.lineWidth = 3.5 * u; x.beginPath(); x.ellipse(w / 2, h / 2, rx, ry, 0, 0, 7); x.stroke();
+  x.lineWidth = 1.2 * u; x.beginPath(); x.ellipse(w / 2, h / 2, rx - 9 * u, ry - 9 * u, 0, 0, 7); x.stroke();
+  [-1, 1].forEach((s) => {   // flourishes above and below the oval
+    const cy = h / 2 + s * (ry + 20 * u);
+    x.lineWidth = 2 * u; x.lineCap = "round";
+    [-1, 1].forEach((d) => { x.beginPath(); x.moveTo(w / 2, cy); x.bezierCurveTo(w / 2 + d * 22 * u, cy - s * 18 * u, w / 2 + d * 46 * u, cy + s * 14 * u, w / 2 + d * 30 * u, cy + s * 2 * u); x.stroke(); dot(w / 2 + d * 56 * u, cy, 2.6 * u); });
+    diamond(w / 2, cy + s * 8 * u, 6 * u);
+  });
+  // the name, stamped in the oval
+  const words = label.toUpperCase().split(" "); let size = 62 * u;
+  x.textAlign = "center"; x.textBaseline = "middle";
+  const fits = () => { x.font = `${size}px Italiana, Didot, Georgia, serif`; return Math.max(...words.map((t) => x.measureText(t).width)) <= rx * 1.52; };
+  while (!fits() && size > 14 * u) size -= 2 * u;
+  words.forEach((t, i) => x.fillText(t, w / 2, h / 2 + (i - (words.length - 1) / 2) * size * 1.08));
+}
+
+function initBook(items) {
+  const canvas = document.getElementById("gl");
+  if (!window.THREE) throw new Error("3D library did not load");
+  const T = THREE;
+  const renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = T.sRGBEncoding;
+  renderer.toneMapping = T.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = .95;
+  const scene = new T.Scene();
+  const camera = new T.PerspectiveCamera(35, 1, .1, 100);
+  camera.position.set(0, 0, 9);
+
+  // a painted room for the gilding to reflect
+  const ec = document.createElement("canvas"); ec.width = 512; ec.height = 256;
+  const g = ec.getContext("2d"), lg = g.createLinearGradient(0, 0, 0, 256);
+  [[0, "#1a1410"], [.3, "#3a2410"], [.44, "#ffd98a"], [.5, "#fffaf0"], [.56, "#c98a2e"], [.72, "#2a1206"], [1, "#050403"]].forEach(([o, c]) => lg.addColorStop(o, c));
+  g.fillStyle = lg; g.fillRect(0, 0, 512, 256);
+  [[70, 60, 46], [250, 40, 60], [400, 80, 40], [330, 190, 50], [150, 200, 36]].forEach(([px, py, rad]) => {
+    const rg = g.createRadialGradient(px, py, 0, px, py, rad); rg.addColorStop(0, "rgba(255,255,255,.95)"); rg.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = rg; g.fillRect(px - rad, py - rad, rad * 2, rad * 2);
+  });
+  const etex = new T.CanvasTexture(ec); etex.mapping = T.EquirectangularReflectionMapping; etex.encoding = T.sRGBEncoding;
+  const pm = new T.PMREMGenerator(renderer); const env = pm.fromEquirectangular(etex).texture; pm.dispose();
+
+  scene.add(new T.AmbientLight(0xffffff, .2));
+  const sun = new T.DirectionalLight(0xfff1d6, .75); sun.position.set(2.5, 4, 7); scene.add(sun);
+  const tint = new T.PointLight(0xff4466, .7, 30); tint.position.set(-4, 1, 4); scene.add(tint);
+  const tintTo = new T.Color(0xff4466);
+
+  // textures
+  const CW = 640, CH = 890, aniso = renderer.capabilities.getMaxAnisotropy();
+  const tex = (cv, srgb) => { const t = new T.CanvasTexture(cv); if (srgb) t.encoding = T.sRGBEncoding; t.anisotropy = aniso; return t; };
+  const mk = () => { const c = document.createElement("canvas"); c.width = CW; c.height = CH; return c; };
+  const fronts = items.map((it) => {
+    const set = { c: mk(), o: mk(), b: mk() };
+    set.draw = () => { paintCover(set.c, "color", it.cover, it.brand, true); paintCover(set.o, "orm", it.cover, it.brand, true); paintCover(set.b, "bump", it.cover, it.brand, true); if (set.map) [set.map, set.orm, set.bump].forEach((t) => t.needsUpdate = true); };
+    set.draw(); set.map = tex(set.c, true); set.orm = tex(set.o); set.bump = tex(set.b);
+    return set;
+  });
+  if (document.fonts && document.fonts.load) document.fonts.load("60px Italiana").then(() => fronts.forEach((s) => s.draw())).catch(() => {});
+  const plainC = mk(), plainB = mk(); paintCover(plainC, "color", "#f0f0f0", "", false); paintCover(plainB, "bump", "", "", false);
+  const edgeCv = document.createElement("canvas"); edgeCv.width = 64; edgeCv.height = 64;
+  { const e = edgeCv.getContext("2d"); e.fillStyle = "#e9dcc0"; e.fillRect(0, 0, 64, 64); for (let i = 0; i < 64; i += 2) { e.fillStyle = `rgba(110,80,40,${.1 + (i * 7 % 5) * .05})`; e.fillRect(i, 0, 1, 64); } }
+  const pageCv = document.createElement("canvas"); pageCv.width = 460; pageCv.height = 640;
+  { const p = pageCv.getContext("2d"); p.fillStyle = "#efe5cf"; p.fillRect(0, 0, 460, 640); p.fillStyle = "#8c0c0a"; p.fillRect(52, 70, 44, 50); p.fillStyle = "rgba(40,28,16,.5)";
+    let s = 9; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let y = 76, i = 0; y < 580; y += 17, i++) { const x0 = i < 3 ? 108 : 52; p.fillRect(x0, y, (408 - x0) * (i % 7 === 6 ? .5 + r() * .3 : 1), 3); } }
+
+  const front = new T.MeshStandardMaterial({ map: fronts[0].map, roughnessMap: fronts[0].orm, metalnessMap: fronts[0].orm, bumpMap: fronts[0].bump, bumpScale: .012, roughness: 1, metalness: 1, envMap: env, envMapIntensity: 1.25 });
+  const cloth = new T.MeshStandardMaterial({ map: tex(plainC, true), bumpMap: tex(plainB), bumpScale: .012, roughness: .85, metalness: 0, color: items[0].cover });
+  const clothEdge = new T.MeshStandardMaterial({ roughness: .8, color: items[0].cover });
+  const endpaper = new T.MeshStandardMaterial({ color: 0xe3d5b4, roughness: .9 });
+  const edgeTex = tex(edgeCv, true);
+  const edges = new T.MeshStandardMaterial({ map: edgeTex, roughness: .9 });
+  const firstPage = new T.MeshStandardMaterial({ map: tex(pageCv, true), roughness: .92 });
+
+  const W = 2.3, H = 3.2, D = .52, CT = .05;
+  const tilt = new T.Group(), spin = new T.Group();
+  tilt.add(spin); scene.add(tilt);
+  const pages = new T.Mesh(new T.BoxGeometry(W - .1, H - .14, D - 2 * CT), [edges, endpaper, edges, edges, firstPage, endpaper]); pages.position.x = -.02; spin.add(pages);
+  const back = new T.Mesh(new T.BoxGeometry(W, H, CT), [clothEdge, clothEdge, clothEdge, clothEdge, endpaper, cloth]); back.position.z = -D / 2 + CT / 2; spin.add(back);
+  const spine = new T.Mesh(new T.BoxGeometry(CT, H, D), clothEdge); spine.position.x = -W / 2 - CT / 2 + .001; spin.add(spine);
+  const hinge = new T.Group(); hinge.position.set(-W / 2, 0, D / 2 - CT / 2); spin.add(hinge);
+  const cover = new T.Mesh(new T.BoxGeometry(W, H, CT), [clothEdge, clothEdge, clothEdge, clothEdge, front, endpaper]); cover.position.x = W / 2; hinge.add(cover);
+  const glow = new T.PointLight(0xffdf9a, 0, 6); glow.position.set(.3, 0, D / 2 + .5); spin.add(glow);
+
+  book3d.setItem = (i) => {
+    const s = fronts[i]; front.map = s.map; front.roughnessMap = s.orm; front.metalnessMap = s.orm; front.bumpMap = s.bump; front.needsUpdate = true;
+    cloth.color.set(items[i].cover); clothEdge.color.set(items[i].cover); tintTo.set(items[i].colors[2]);
+  };
+
+  let seed = 5; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const dustGeo = new T.BufferGeometry(), dp = new Float32Array(240 * 3);
+  for (let i = 0; i < dp.length; i += 3) { dp[i] = (rnd() - .5) * 14; dp[i + 1] = (rnd() - .5) * 8; dp[i + 2] = (rnd() - .5) * 8 - 1; }
+  dustGeo.setAttribute("position", new T.BufferAttribute(dp, 3));
+  const dust = new T.Points(dustGeo, new T.PointsMaterial({ color: 0xffd98a, size: .035, transparent: true, opacity: .7, depthWrite: false }));
+  scene.add(dust);
+
+  let base = .86, baseY = .62;
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    const narrow = w / h < .7; base = narrow ? .6 : .86; baseY = narrow ? .8 : .62;
+  }
+  window.addEventListener("resize", resize); resize();
+
+  const ANGLES = [0, .2, .7, 2.9], FACE = [0, -.6, -.5, 0];
+  let last = performance.now(), time = 0, angle = 0, facing = 0, wide = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (document.hidden) { last = now; return; }
+    const dt = Math.min(.05, (now - last) / 1000); last = now; time += dt;
+    const st = book3d.stage, k = (rate) => REDUCED ? 1 : Math.min(1, dt * rate);
+    book3d.hover = (book3d.hover || 0) + (book3d.hoverTarget - (book3d.hover || 0)) * k(8);
+    book3d.boost *= Math.exp(-dt * 2.4); book3d.jolt *= Math.exp(-dt * 5);
+    angle += (ANGLES[st] + (st < 3 ? book3d.hover * .07 : 0) - angle) * k(st === 3 ? 2.6 : 5);
+    hinge.rotation.y = -angle;
+    facing += ((st ? 1 : 0) - facing) * k(4);
+    wide += ((st === 3 ? 1 : 0) - wide) * k(2.6);
+    if (st === 0 && !REDUCED) spin.rotation.y += dt * (.55 + book3d.boost + book3d.hover * .4);
+    else {
+      const a = st === 0 ? -.45 : FACE[st], goal = a + Math.PI * 2 * Math.round((spin.rotation.y - a) / (Math.PI * 2));
+      spin.rotation.y += (goal - spin.rotation.y) * k(5);
+    }
+    const shake = Math.sin(time * 46) * book3d.jolt;
+    tilt.rotation.z = -.1 * (1 - facing) + shake * .05;
+    tilt.rotation.x = .06 * (1 - wide);
+    const s = base * (1 + wide * .12 + book3d.hover * .03 * (1 - wide));
+    tilt.scale.setScalar(s);
+    tilt.position.set(wide * W / 2 * s + shake * .04, baseY * (1 - wide) - .14 * wide, 0);
+    glow.intensity = Math.min(1, angle * 1.4) * .9;
+    tint.color.lerp(tintTo, k(2.5));
+    dust.rotation.y = time * .02;
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+}
+try { initBook(ITEMS); } catch (err) { document.getElementById("gl").hidden = true; document.getElementById("flat-book").hidden = false; }
+
+/* ============ PAGE ============ */
+const $ = (id) => document.getElementById(id);
+const pad = (n) => String(n).padStart(2, "0");
+let idx = 0, isOpen = false, taps = 0;
+const wrapIdx = (i) => (i + ITEMS.length) % ITEMS.length;
+const hashOf = (it) => it.isBrand ? it.id : "file-" + it.id;
+
+function hint() {
+  $("dots").innerHTML = Array.from({ length: TAPS }, (_, k) => `<i class="${k < taps ? "on" : ""}"></i>`).join("");
+  const left = TAPS - taps;
+  $("cur-hint").textContent = taps === 0 ? "Tap the book to open it" : left === 1 ? "Almost. One more tap" : "It moved. Tap again";
+  $("open").setAttribute("aria-label", `Tap the book to open it, ${left} ${left === 1 ? "tap" : "taps"} to go`);
+}
+function show(i, dir) {
+  idx = wrapIdx(i); taps = 0; book3d.stage = 0;
+  const it = ITEMS[idx], root = document.documentElement.style;
+  root.setProperty("--c0", it.colors[0]); root.setProperty("--c1", it.colors[1]); root.setProperty("--cover", it.cover);
+  book3d.setItem(idx); book3d.boost = 7 * (dir || 1);
+  $("count").textContent = pad(idx + 1) + " / " + pad(ITEMS.length);
+  $("cur-title").textContent = it.brand;
+  $("cur-hook").textContent = it.hook;
+  $("prev").textContent = ITEMS[wrapIdx(idx - 1)].brand;
+  $("next").textContent = ITEMS[wrapIdx(idx + 1)].brand;
+  document.querySelectorAll("#index button").forEach((b, k) => b.setAttribute("aria-current", k === idx ? "true" : "false"));
+  hint();
+  const c = $("carousel"); c.classList.remove("swap"); void c.offsetWidth; c.classList.add("swap");
+}
+function tap() {
+  if (isOpen) return;
+  taps++; book3d.jolt = 1;
+  if (taps >= TAPS) openItem(); else { book3d.stage = taps; hint(); }
+}
+function openItem() {
+  const it = ITEMS[idx];
+  isOpen = true; taps = TAPS; book3d.stage = 3; document.body.classList.add("open");
+  $("toplink").textContent = "Close"; $("toplink").setAttribute("href", "#gallery");
+  $("story-panel").hidden = !!it.isBrand; $("brand-panel").hidden = !it.isBrand;
+  if (!it.isBrand) {
+    $("s-cover").innerHTML = art(it);
+    $("s-no").innerHTML = "Nº " + String(STORIES.length - idx).padStart(3, "0") + " · " + it.brand + " · " + it.minutes + " min" + (it.brandTold ? ' &nbsp;<span class="tag">Told by the brand</span>' : "");
+    $("s-title").textContent = it.title; $("s-dek").textContent = it.dek;
+    $("s-body").innerHTML = it.body.map((p) => `<p>${p}</p>`).join("");
+    const nx = ITEMS[wrapIdx(idx + 1)];
+    $("s-next").innerHTML = (nx.isBrand ? "Tell your brand's story" : "Next book: " + nx.brand) + " &rarr;";
+    $("story-sheet").scrollTop = 0; $("story-sheet").querySelectorAll(".page").forEach((p) => p.scrollTop = 0);
+  }
+  document.title = (it.isBrand ? "For brands" : it.title) + " · Hidden Stories of Luxury";
+  if (location.hash !== "#" + hashOf(it)) location.hash = hashOf(it);
+  setTimeout(() => { if (isOpen) (it.isBrand ? $("brand-sheet") : $("story-sheet")).focus({ preventScroll: true }); }, 900);
+}
+function closeItem() {
+  if (!isOpen) return;
+  isOpen = false; taps = 0; book3d.stage = 0; document.body.classList.remove("open");
+  $("story-panel").hidden = true; $("brand-panel").hidden = true;
+  $("toplink").textContent = "For brands"; $("toplink").setAttribute("href", "#tell-your-story");
+  document.title = "Hidden Stories of Luxury"; hint();
+  if (location.hash && location.hash !== "#gallery") location.hash = "gallery";
+}
+function route() {
+  const h = location.hash.replace("#", "");
+  const i = ITEMS.findIndex((it) => hashOf(it) === h);
+  if (i >= 0) { if (!isOpen || i !== idx) { if (i !== idx) show(i); openItem(); } }
+  else closeItem();
+}
+function step(d) { if (!isOpen) show(idx + d, d); }
+
+$("index").innerHTML = ITEMS.map((it, k) => `<li><button data-i="${k}"><span>${pad(k + 1)}</span>${it.brand}</button></li>`).join("");
+$("index").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) show(+b.dataset.i, +b.dataset.i < idx ? -1 : 1); });
+$("prev").addEventListener("click", () => step(-1));
+$("next").addEventListener("click", () => step(1));
+$("open").addEventListener("click", tap);
+$("open").addEventListener("pointerenter", () => book3d.hoverTarget = 1);
+$("open").addEventListener("pointerleave", () => book3d.hoverTarget = 0);
+$("cur-title").addEventListener("click", tap);
+document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", closeItem));
+$("s-next").addEventListener("click", () => { closeItem(); setTimeout(() => { show(idx + 1, 1); setTimeout(openItem, 700); }, 400); });
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeItem();
+  else if (!isOpen && e.key === "ArrowRight") step(1);
+  else if (!isOpen && e.key === "ArrowLeft") step(-1);
+});
+let wheelAt = 0;
+window.addEventListener("wheel", (e) => {
+  if (isOpen) return;
+  const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now();
+  if (Math.abs(d) < 12 || now - wheelAt < 750) return;
+  wheelAt = now; step(d > 0 ? 1 : -1);
+}, { passive: true });
+let touchX = null;
+window.addEventListener("touchstart", (e) => { touchX = isOpen ? null : e.touches[0].clientX; }, { passive: true });
+window.addEventListener("touchend", (e) => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+  if (Math.abs(dx) > 45) step(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+/* ============ FORM ============ */
+$("brand-form").hidden = !FORM_ENDPOINT; $("soon-note").hidden = !!FORM_ENDPOINT;   // no inbox connected yet: show a note instead of a form that goes nowhere
+function say(html) { const m = $("form-msg"); m.innerHTML = html; m.hidden = false; m.scrollIntoView({ block: "nearest" }); }
+$("brand-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form).entries());
+  const missing = [];
+  if (!data.brand?.trim()) missing.push("the brand");
+  if (!data.name?.trim()) missing.push("your name");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email || "")) missing.push("a valid email");
+  if (!data.story?.trim()) missing.push("the story");
+  if (!data.consent) missing.push("your agreement to be contacted");
+  if (missing.length) return say("<b>Almost.</b> Please add " + missing.join(", ") + ".");
+    const btn = $("f-send");
+  btn.disabled = true; btn.textContent = "Sending…";
+  try {
+    const res = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(data) });
+    if (!res.ok) throw new Error(res.status);
+    form.reset();
+    say("<b>Received.</b> Your story is with us. We will be in touch by email.");
+  } catch (err) {
+    say("<b>It did not go through.</b> Please check your connection and try again.");
+  } finally {
+    btn.disabled = false; btn.textContent = "Send your story";
+  }
+});
+
+show(0); book3d.boost = 0;
+route();
+window.addEventListener("hashchange", route);
+</script>
+</body>
+</html>
