@@ -24,7 +24,7 @@ const STORIES = [
       "In 1917, Pierre Cartier wanted a proper home for the house in New York. The one he had his eye on belonged to the railroad heir Morton Plant: a Renaissance-style mansion on the corner of Fifth Avenue and 52nd Street.",
       "Plant's wife, Maisie, had her eye on something too. In Cartier's showcase sat a double strand of natural pearls, at the time among the most expensive necklaces in the world, valued at <mark>one million dollars</mark>.",
       "So Cartier proposed a trade. The pearls, plus <mark>$100 in cash</mark>, for the building. Plant agreed. In 1917 that looked like a fair deal, because fine natural pearls were worth more than Manhattan stone.",
-      "Then cultured pearls arrived and the market collapsed. After Maisie's death the necklace went to auction in 1957 and sold for <mark>$151,000</mark>. The mansion is still Cartier's New York flagship."
+      "Then cultured pearls arrived and the market collapsed. After Maisie's death the necklace went to auction in 1957 and sold for <mark>about $150,000</mark>. The mansion is still Cartier's New York flagship."
     ]
   },
   {
@@ -62,7 +62,7 @@ const STORIES = [
     body: [
       "In 1927 a London typist named Mercedes Gleitze became the first Englishwoman to swim the Channel. When another woman falsely claimed a faster crossing, doubt fell on Gleitze too, so she announced she would swim it again to clear her name.",
       "Hans Wilsdorf, the founder of Rolex, saw his moment. He had just launched the Oyster, which he said was waterproof, and almost nobody believed him. He asked Gleitze to <mark>wear one around her neck</mark>.",
-      "The water was brutally cold. After <mark>more than ten hours</mark> she was pulled out, a few miles short of the coast. The swim failed. The watch did not: it was still running and dry inside.",
+      "The water was brutally cold. After <mark>more than ten hours</mark> she was pulled out before reaching the English coast. The swim failed. The watch did not: it was still running and dry inside.",
       "Wilsdorf bought <mark>the front page of the Daily Mail</mark> to say so. Sports stars wearing watches for money starts here."
     ]
   }
